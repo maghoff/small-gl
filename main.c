@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <sys/time.h>
 #include <stdbool.h>
 
 #include <X11/Xlib.h>
@@ -85,8 +84,6 @@ void render()
    static float  phase = 0;
    static int    donesetup = 0;
 
-   static XWindowAttributes gwa;
-
    //// draw
 
    if ( !donesetup ) {
@@ -154,25 +151,10 @@ int main()
               &swa );
 
    XSetWindowAttributes  xattr;
-   Atom  atom;
-   int   one = 1;
 
    xattr.override_redirect = False;
    XChangeWindowAttributes ( x_display, win, CWOverrideRedirect, &xattr );
-/*
-   atom = XInternAtom ( x_display, "_NET_WM_STATE_FULLSCREEN", True );
-   XChangeProperty (
-      x_display, win,
-      XInternAtom ( x_display, "_NET_WM_STATE", True ),
-      XA_ATOM,  32,  PropModeReplace,
-      (unsigned char*) &atom,  1 );
 
-   XChangeProperty (
-      x_display, win,
-      XInternAtom ( x_display, "_HILDON_NON_COMPOSITED_WINDOW", True ),
-      XA_INTEGER,  32,  PropModeReplace,
-      (unsigned char*) &one,  1);
- */
    XWMHints hints;
    hints.input = True;
    hints.flags = InputHint;
@@ -277,12 +259,6 @@ int main()
       window_width  = 800.0,
       window_height = 480.0;
 
-   //// this is needed for time measuring  -->  frames per second
-   struct  timezone  tz;
-   struct timeval  t1, t2;
-   gettimeofday ( &t1 , &tz );
-   int  num_frames = 0;
-
    bool quit = false;
    while ( !quit ) {    // the main loop
 
@@ -303,14 +279,6 @@ int main()
       }
 
       render();   // now we finally put something on the screen
-
-      if ( ++num_frames % 100 == 0 ) {
-         gettimeofday( &t2, &tz );
-         float dt  =  t2.tv_sec - t1.tv_sec + (t2.tv_usec - t1.tv_usec) * 1e-6;
-         num_frames = 0;
-         t1 = t2;
-      }
-//      usleep( 1000*10 );
    }
 
 
