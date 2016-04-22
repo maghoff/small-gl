@@ -87,12 +87,5 @@ int main()
 		eglSwapBuffers ( egl_display, egl_surface );  // get the rendered buffer to the screen
 	}
 
-	////  cleaning up...
-	eglDestroyContext ( egl_display, egl_context );
-	eglDestroySurface ( egl_display, egl_surface );
-	eglTerminate      ( egl_display );
-	XDestroyWindow    ( x_display, win );
-	XCloseDisplay     ( x_display );
-
 	return 0;
 }
