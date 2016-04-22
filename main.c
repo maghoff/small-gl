@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 #include <stdbool.h>
 
@@ -168,8 +167,6 @@ int main()
    Atom fullscreen = XInternAtom ( x_display, "_NET_WM_STATE_FULLSCREEN", False );
 
    XEvent xev;
-   memset ( &xev, 0, sizeof(xev) );
-
    xev.type                 = ClientMessage;
    xev.xclient.window       = win;
    xev.xclient.message_type = wm_state;
