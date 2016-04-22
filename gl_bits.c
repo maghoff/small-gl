@@ -3,34 +3,8 @@
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
 
-
-static const char vertex_src [] =
-"                                        \
-   attribute vec4        position;       \
-   varying mediump vec2  pos;            \
-   uniform vec4          offset;         \
-                                         \
-   void main()                           \
-   {                                     \
-      gl_Position = position + offset;   \
-      pos = position.xy;                 \
-   }                                     \
-";
-
-
-static const char fragment_src [] =
-"                                                      \
-   varying mediump vec2    pos;                        \
-   uniform mediump float   phase;                      \
-                                                       \
-   void  main()                                        \
-   {                                                   \
-      gl_FragColor  =  vec4( 1., 0.9, 0.7, 1.0 ) *     \
-        cos( 30.*sqrt(pos.x*pos.x + 1.5*pos.y*pos.y)   \
-             + atan(pos.y,pos.x) - phase );            \
-   }                                                   \
-";
-
+#include "vertex_glsl.h"
+#include "fragment_glsl.h"
 
 static GLuint load_shader(const char *shader_source, GLenum type)
 {
@@ -101,8 +75,8 @@ void render(int width, int height)
 }
 
 int init_gl_resources() {
-   GLuint vertexShader   = load_shader ( vertex_src , GL_VERTEX_SHADER  );     // load vertex shader
-   GLuint fragmentShader = load_shader ( fragment_src , GL_FRAGMENT_SHADER );  // load fragment shader
+   GLuint vertexShader   = load_shader ( vertex_glsl , GL_VERTEX_SHADER  );     // load vertex shader
+   GLuint fragmentShader = load_shader ( fragment_glsl , GL_FRAGMENT_SHADER );  // load fragment shader
 
    GLuint shaderProgram  = glCreateProgram ();                 // create program object
    glAttachShader ( shaderProgram, vertexShader );             // and attach both...
