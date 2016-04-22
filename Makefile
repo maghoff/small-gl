@@ -1,2 +1,2 @@
-main: main.cpp
-	g++ -o $@ $< -lX11 -lEGL -lGLESv2 -Os -s -nostartfiles
+main: main.c
+	gcc -o $@ $< -lX11 -lEGL -lGLESv2 -lm -Os -s -nostartfiles

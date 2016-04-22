@@ -6,19 +6,19 @@
  * compile with:   g++  -lX11 -lEGL -lGLESv2  egl-example.cpp
  */
  
-#include  <stdlib.h>
-#include  <string.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <sys/time.h>
+#include <stdbool.h>
  
-#include  <cmath>
-#include  <sys/time.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
  
-#include  <X11/Xlib.h>
-#include  <X11/Xatom.h>
-#include  <X11/Xutil.h>
- 
-#include  <GLES2/gl2.h>
-#include  <EGL/egl.h>
- 
+#include <GLES2/gl2.h>
+#include <EGL/egl.h>
+
  
  
 const char vertex_src [] =
@@ -64,9 +64,9 @@ print_shader_info_log (
    glGetShaderiv ( shader , GL_INFO_LOG_LENGTH , &length );
  
    if ( length ) {
-      char* buffer  =  new char [ length ];
+      char* buffer  =  malloc(length);
       glGetShaderInfoLog ( shader , length , NULL , buffer );
-      delete [] buffer;
+      free(buffer);
  
       GLint success;
       glGetShaderiv( shader, GL_COMPILE_STATUS, &success );
@@ -322,7 +322,7 @@ int main()
  
    //// this is needed for time measuring  -->  frames per second
    struct  timezone  tz;
-   timeval  t1, t2;
+   struct timeval  t1, t2;
    gettimeofday ( &t1 , &tz );
    int  num_frames = 0;
  
@@ -367,6 +367,6 @@ int main()
    return 0;
 }
 
-extern "C" void _start() {
+void _start() {
 	exit(main());
 }
