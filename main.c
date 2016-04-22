@@ -323,6 +323,3 @@ int main()
 
    return 0;
 }
-void _start() {
-	exit(main());
-}
