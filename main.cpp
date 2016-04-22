@@ -6,10 +6,8 @@
  * compile with:   g++  -lX11 -lEGL -lGLESv2  egl-example.cpp
  */
  
-#include  <iostream>
-#include  <cstdlib>
-#include  <cstring>
-using namespace std;
+#include  <stdlib.h>
+#include  <string.h>
  
 #include  <cmath>
 #include  <sys/time.h>
@@ -68,7 +66,6 @@ print_shader_info_log (
    if ( length ) {
       char* buffer  =  new char [ length ];
       glGetShaderInfoLog ( shader , length , NULL , buffer );
-      cout << "shader info: " <<  buffer << flush;
       delete [] buffer;
  
       GLint success;
@@ -176,7 +173,7 @@ void  render()
 ////////////////////////////////////////////////////////////////////////////////////////////
  
  
-int  main()
+int main()
 {
    ///////  the X11 part  //////////////////////////////////////////////////////////////////
    // in the first part the program opens a connection to the X11 window manager
@@ -184,7 +181,6 @@ int  main()
  
    x_display = XOpenDisplay ( NULL );   // open the standard display (the primary screen)
    if ( x_display == NULL ) {
-      cerr << "cannot connect to X server" << endl;
       return 1;
    }
  
@@ -256,12 +252,10 @@ int  main()
  
    egl_display  =  eglGetDisplay( (EGLNativeDisplayType) x_display );
    if ( egl_display == EGL_NO_DISPLAY ) {
-      cerr << "Got no EGL display." << endl;
       return 1;
    }
  
    if ( !eglInitialize( egl_display, NULL, NULL ) ) {
-      cerr << "Unable to initialize EGL" << endl;
       return 1;
    }
  
@@ -275,18 +269,15 @@ int  main()
    EGLConfig  ecfg;
    EGLint     num_config;
    if ( !eglChooseConfig( egl_display, attr, &ecfg, 1, &num_config ) ) {
-      cerr << "Failed to choose config (eglError: " << eglGetError() << ")" << endl;
       return 1;
    }
  
    if ( num_config != 1 ) {
-      cerr << "Didn't get exactly one config, but " << num_config << endl;
       return 1;
    }
  
    egl_surface = eglCreateWindowSurface ( egl_display, ecfg, win, NULL );
    if ( egl_surface == EGL_NO_SURFACE ) {
-      cerr << "Unable to create EGL surface (eglError: " << eglGetError() << ")" << endl;
       return 1;
    }
  
@@ -297,7 +288,6 @@ int  main()
    };
    egl_context = eglCreateContext ( egl_display, ecfg, EGL_NO_CONTEXT, ctxattr );
    if ( egl_context == EGL_NO_CONTEXT ) {
-      cerr << "Unable to create EGL context (eglError: " << eglGetError() << ")" << endl;
       return 1;
    }
  
@@ -322,7 +312,6 @@ int  main()
    phase_loc     = glGetUniformLocation ( shaderProgram , "phase"    );
    offset_loc    = glGetUniformLocation ( shaderProgram , "offset"   );
    if ( position_loc < 0  ||  phase_loc < 0  ||  offset_loc < 0 ) {
-      cerr << "Unable to get uniform location" << endl;
       return 1;
    }
  
@@ -346,7 +335,6 @@ int  main()
          XNextEvent( x_display, &xev );
  
          if ( xev.type == MotionNotify ) {  // if mouse has moved
-//            cout << "move to: << xev.xmotion.x << "," << xev.xmotion.y << endl;
             GLfloat window_y  =  (window_height - xev.xmotion.y) - window_height / 2.0;
             norm_y            =  window_y / (window_height / 2.0);
             GLfloat window_x  =  xev.xmotion.x - window_width / 2.0;
@@ -362,7 +350,6 @@ int  main()
       if ( ++num_frames % 100 == 0 ) {
          gettimeofday( &t2, &tz );
          float dt  =  t2.tv_sec - t1.tv_sec + (t2.tv_usec - t1.tv_usec) * 1e-6;
-         cout << "fps: " << num_frames / dt << endl;
          num_frames = 0;
          t1 = t2;
       }
@@ -378,4 +365,8 @@ int  main()
    XCloseDisplay     ( x_display );
  
    return 0;
+}
+
+extern "C" void _start() {
+	exit(main());
 }
