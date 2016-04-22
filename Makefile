@@ -1,2 +1,4 @@
-main: main.c
-	gcc -Wall -o $@ $< -lX11 -lEGL -lGLESv2 -lm -Os -s
+SRCS=main.c gl_bits.c
+
+main: $(SRCS)
+	gcc -Wall -o $@ $(SRCS) -lX11 -lEGL -lGLESv2 -lm -Os -s

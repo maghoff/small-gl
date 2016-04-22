@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <math.h>
 #include <stdbool.h>
 
 #include <X11/Xlib.h>
@@ -9,125 +7,17 @@
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
 
-
-const char vertex_src [] =
-"                                        \
-   attribute vec4        position;       \
-   varying mediump vec2  pos;            \
-   uniform vec4          offset;         \
-                                         \
-   void main()                           \
-   {                                     \
-      gl_Position = position + offset;   \
-      pos = position.xy;                 \
-   }                                     \
-";
-
-
-const char fragment_src [] =
-"                                                      \
-   varying mediump vec2    pos;                        \
-   uniform mediump float   phase;                      \
-                                                       \
-   void  main()                                        \
-   {                                                   \
-      gl_FragColor  =  vec4( 1., 0.9, 0.7, 1.0 ) *     \
-        cos( 30.*sqrt(pos.x*pos.x + 1.5*pos.y*pos.y)   \
-             + atan(pos.y,pos.x) - phase );            \
-   }                                                   \
-";
-
-
-GLuint load_shader(const char *shader_source, GLenum type)
-{
-   GLuint  shader = glCreateShader(type);
-   glShaderSource(shader, 1, &shader_source, NULL);
-   glCompileShader(shader);
-   return shader;
-}
-
-
-Display    *x_display;
-Window      win;
-EGLDisplay  egl_display;
-EGLContext  egl_context;
-EGLSurface  egl_surface;
-
-GLfloat
-   norm_x    =  0.0,
-   norm_y    =  0.0,
-   offset_x  =  0.0,
-   offset_y  =  0.0,
-   p1_pos_x  =  0.0,
-   p1_pos_y  =  0.0;
-
-GLint
-   phase_loc,
-   offset_loc,
-   position_loc;
-
-
-bool update_pos = false;
-
-const float vertexArray[] = {
-   0.0,  0.5,  0.0,
-  -0.5,  0.0,  0.0,
-   0.0, -0.5,  0.0,
-   0.5,  0.0,  0.0,
-   0.0,  0.5,  0.0
-};
-
-
-void render()
-{
-   static float  phase = 0;
-   static int    donesetup = 0;
-
-   //// draw
-
-   if ( !donesetup ) {
-      XWindowAttributes  gwa;
-      XGetWindowAttributes ( x_display , win , &gwa );
-      glViewport ( 0 , 0 , gwa.width , gwa.height );
-      glClearColor ( 0.08 , 0.06 , 0.07 , 1.);    // background color
-      donesetup = 1;
-   }
-   glClear ( GL_COLOR_BUFFER_BIT );
-
-   glUniform1f ( phase_loc , phase );  // write the value of phase to the shaders phase
-   phase  =  fmodf ( phase + 0.5f , 2.f * 3.141f );    // and update the local variable
-
-   if ( update_pos ) {  // if the position of the texture has changed due to user action
-      GLfloat old_offset_x  =  offset_x;
-      GLfloat old_offset_y  =  offset_y;
-
-      offset_x  =  norm_x - p1_pos_x;
-      offset_y  =  norm_y - p1_pos_y;
-
-      p1_pos_x  =  norm_x;
-      p1_pos_y  =  norm_y;
-
-      offset_x  +=  old_offset_x;
-      offset_y  +=  old_offset_y;
-
-      update_pos = false;
-   }
-
-   glUniform4f ( offset_loc  ,  offset_x , offset_y , 0.0 , 0.0 );
-
-   glVertexAttribPointer ( position_loc, 3, GL_FLOAT, false, 0, vertexArray );
-   glEnableVertexAttribArray ( position_loc );
-   glDrawArrays ( GL_TRIANGLE_STRIP, 0, 5 );
-
-   eglSwapBuffers ( egl_display, egl_surface );  // get the rendered buffer to the screen
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
+void init_gl_resources();
+void render(int width, int height);
 
 int main()
 {
+	Display    *x_display;
+	Window      win;
+	EGLDisplay  egl_display;
+	EGLContext  egl_context;
+	EGLSurface  egl_surface;
+
    ///////  the X11 part  //////////////////////////////////////////////////////////////////
    // in the first part the program opens a connection to the X11 window manager
    //
@@ -231,30 +121,10 @@ int main()
    eglMakeCurrent( egl_display, egl_surface, egl_surface, egl_context );
 
 
-   ///////  the openGL part  ///////////////////////////////////////////////////////////////
+   init_gl_resources();
 
-   GLuint vertexShader   = load_shader ( vertex_src , GL_VERTEX_SHADER  );     // load vertex shader
-   GLuint fragmentShader = load_shader ( fragment_src , GL_FRAGMENT_SHADER );  // load fragment shader
-
-   GLuint shaderProgram  = glCreateProgram ();                 // create program object
-   glAttachShader ( shaderProgram, vertexShader );             // and attach both...
-   glAttachShader ( shaderProgram, fragmentShader );           // ... shaders to it
-
-   glLinkProgram ( shaderProgram );    // link the program
-   glUseProgram  ( shaderProgram );    // and select it for usage
-
-   //// now get the locations (kind of handle) of the shaders variables
-   position_loc  = glGetAttribLocation  ( shaderProgram , "position" );
-   phase_loc     = glGetUniformLocation ( shaderProgram , "phase"    );
-   offset_loc    = glGetUniformLocation ( shaderProgram , "offset"   );
-   if ( position_loc < 0  ||  phase_loc < 0  ||  offset_loc < 0 ) {
-      return 1;
-   }
-
-
-   const float
-      window_width  = 800.0,
-      window_height = 480.0;
+	XWindowAttributes  gwa;
+	XGetWindowAttributes ( x_display , win , &gwa );
 
    bool quit = false;
    while ( !quit ) {    // the main loop
@@ -263,19 +133,11 @@ int main()
 
          XEvent  xev;
          XNextEvent( x_display, &xev );
-
-         if ( xev.type == MotionNotify ) {  // if mouse has moved
-            GLfloat window_y  =  (window_height - xev.xmotion.y) - window_height / 2.0;
-            norm_y            =  window_y / (window_height / 2.0);
-            GLfloat window_x  =  xev.xmotion.x - window_width / 2.0;
-            norm_x            =  window_x / (window_width / 2.0);
-            update_pos = true;
-         }
-
          if ( xev.type == KeyPress )   quit = true;
       }
 
-      render();   // now we finally put something on the screen
+      render(gwa.width, gwa.height);   // now we finally put something on the screen
+   eglSwapBuffers ( egl_display, egl_surface );  // get the rendered buffer to the screen
    }
 
 
