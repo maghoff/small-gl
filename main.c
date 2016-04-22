@@ -4,9 +4,11 @@
 #include <EGL/egl.h>
 
 int init_x11(Display**, Window*);
+
 int init_egl(EGLNativeDisplayType display, EGLNativeWindowType win);
 void flip();
-void init_gl_resources();
+
+int init_gl_resources();
 void render(int width, int height);
 
 int main()
@@ -15,7 +17,7 @@ int main()
 	Window win;
 	if (init_x11(&x_display, &win) != 0) return 1;
 	if (init_egl(x_display, win) != 0) return 1;
-	init_gl_resources();
+	if (init_gl_resources() != 0) return 1;
 
 	XWindowAttributes  gwa;
 	XGetWindowAttributes ( x_display , win , &gwa );

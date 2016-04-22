@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
 #include <GLES2/gl2.h>
@@ -101,7 +100,7 @@ void render(int width, int height)
    glDrawArrays ( GL_TRIANGLE_STRIP, 0, 5 );
 }
 
-void init_gl_resources() {
+int init_gl_resources() {
    GLuint vertexShader   = load_shader ( vertex_src , GL_VERTEX_SHADER  );     // load vertex shader
    GLuint fragmentShader = load_shader ( fragment_src , GL_FRAGMENT_SHADER );  // load fragment shader
 
@@ -117,6 +116,8 @@ void init_gl_resources() {
    phase_loc     = glGetUniformLocation ( shaderProgram , "phase"    );
    offset_loc    = glGetUniformLocation ( shaderProgram , "offset"   );
    if ( position_loc < 0  ||  phase_loc < 0  ||  offset_loc < 0 ) {
-      exit(1);
+	   return 1;
    }
+
+   return 0;
 }
