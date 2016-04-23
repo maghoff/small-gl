@@ -14,35 +14,35 @@ int init_x11() {
 		return 1;
 	}
 
-	Window root  =  DefaultRootWindow( display );   // get the root window (usually the whole screen)
+	Window root = DefaultRootWindow(display); // get the root window (usually the whole screen)
 
-	XSetWindowAttributes  swa;
-	swa.event_mask  =  ExposureMask | PointerMotionMask | KeyPressMask;
+	XSetWindowAttributes swa;
+	swa.event_mask = ExposureMask | PointerMotionMask | KeyPressMask;
 
-	win  =  XCreateWindow(   // create a window with the provided parameters
+	win = XCreateWindow(
 		display, root,
-		0, 0, 800, 480,   0,
+		0, 0, 800, 480, 0,
 		CopyFromParent, InputOutput,
 		CopyFromParent, CWEventMask,
 		&swa
 	);
 
-	XSetWindowAttributes  xattr;
+	XSetWindowAttributes xattr;
 
 	xattr.override_redirect = False;
-	XChangeWindowAttributes ( display, win, CWOverrideRedirect, &xattr );
+	XChangeWindowAttributes(display, win, CWOverrideRedirect, &xattr);
 
 	XWMHints hints;
 	hints.input = True;
 	hints.flags = InputHint;
 	XSetWMHints(display, win, &hints);
 
-	XMapWindow ( display , win );             // make the window visible on the screen
-	XStoreName ( display , win , "GL test" ); // give the window a name
+	XMapWindow(display, win);             // make the window visible on the screen
+	XStoreName(display, win, "GL test");  // give the window a name
 
-	//// get identifiers for the provided atom name strings
-	Atom wm_state   = XInternAtom ( display, "_NET_WM_STATE", False );
-	Atom fullscreen = XInternAtom ( display, "_NET_WM_STATE_FULLSCREEN", False );
+	// get identifiers for the provided atom name strings
+	Atom wm_state   = XInternAtom(display, "_NET_WM_STATE", False);
+	Atom fullscreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
 
 	XEvent xev;
 	xev.type                 = ClientMessage;
@@ -51,12 +51,14 @@ int init_x11() {
 	xev.xclient.format       = 32;
 	xev.xclient.data.l[0]    = 1;
 	xev.xclient.data.l[1]    = fullscreen;
-	XSendEvent (                // send an event mask to the X-server
+
+	XSendEvent(  // send an event mask to the X-server
 		display,
-		DefaultRootWindow ( display ),
+		root,
 		False,
 		SubstructureNotifyMask,
-		&xev );
+		&xev
+	);
 
 	return 0;
 }

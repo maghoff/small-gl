@@ -25,14 +25,14 @@ static const float vertexArray[] = {
 static const float TAU = 2.f * M_PI;
 
 void render(int width, int height) {
-   static float  phase = 0;
+   static float phase = 0;
 
    glViewport(0 , 0 , width , height);
    glClearColor(0.08 , 0.06 , 0.07 , 1.);
    glClear(GL_COLOR_BUFFER_BIT);
 
-   glUniform1f(phase_loc , phase);
-   phase += 0.5f;
+   glUniform1f(phase_loc, phase);
+   phase += 0.25f;
    if (phase > TAU) phase -= TAU;
 
    glVertexAttribPointer(position_loc, 3, GL_FLOAT, false, 0, vertexArray);
