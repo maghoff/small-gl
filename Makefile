@@ -7,7 +7,6 @@ main: $(SRCS) vertex_glsl.h fragment_glsl.h
 		-lX11 \
 		-lEGL \
 		-lGLESv2 \
-		-lm \
 		-Os -flto -s
 
 %_glsl.h: %.glsl

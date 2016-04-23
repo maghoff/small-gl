@@ -39,6 +39,7 @@ static const float vertexArray[] = {
    0.0,  0.5,  0.0
 };
 
+static const float TAU = 2.f * M_PI;
 
 void render(int width, int height)
 {
@@ -48,8 +49,9 @@ void render(int width, int height)
    glClearColor ( 0.08 , 0.06 , 0.07 , 1.);    // background color
    glClear ( GL_COLOR_BUFFER_BIT );
 
-   glUniform1f ( phase_loc , phase );  // write the value of phase to the shaders phase
-   phase  =  fmodf ( phase + 0.5f , 2.f * 3.141f );    // and update the local variable
+   glUniform1f(phase_loc , phase);
+   phase += 0.5f;
+   if (phase > TAU) phase -= TAU;
 
    if ( update_pos ) {  // if the position of the texture has changed due to user action
       GLfloat old_offset_x  =  offset_x;
