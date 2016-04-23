@@ -1,4 +1,7 @@
-main: main.c Makefile
+main: main-prestrip
+	strip -R .comment -o $@ $<
+
+main-prestrip: main.c Makefile
 	gcc \
 		-o $@ \
 		-Os -s \
