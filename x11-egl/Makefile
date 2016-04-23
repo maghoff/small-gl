@@ -31,6 +31,9 @@ main-bin: main-prestrip
 		-R .comment \
 		-R '.note*' \
 		-R '.eh*' \
+		-R '.gnu.version' \
+		-R '.gnu.hash' \
+		-R '.jcr' \
 		-o $@ \
 		$<
 
