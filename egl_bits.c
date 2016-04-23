@@ -1,10 +1,13 @@
 #include <EGL/egl.h>
 
+extern EGLNativeDisplayType display;
+extern EGLNativeWindowType win;
+
 static EGLDisplay egl_display;
 static EGLContext egl_context;
 static EGLSurface egl_surface;
 
-int init_egl(EGLNativeDisplayType display, EGLNativeWindowType win) {
+int init_egl() {
 	egl_display = eglGetDisplay(display);
 	if ( egl_display == EGL_NO_DISPLAY ) {
 		return 1;

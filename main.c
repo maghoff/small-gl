@@ -1,40 +1,16 @@
-#include <stdbool.h>
-
-#include <GLES2/gl2.h>
-#include <EGL/egl.h>
-
-int init_x11(Display**, Window*);
-
-int init_egl(EGLNativeDisplayType display, EGLNativeWindowType win);
-void flip();
-
+int init_x11();
+int init_egl();
 int init_gl_resources();
-void render(int width, int height);
+
+void loop();
 
 int main()
 {
-	Display *x_display;
-	Window win;
-	if (init_x11(&x_display, &win) != 0) return 1;
-	if (init_egl(x_display, win) != 0) return 1;
-	if (init_gl_resources() != 0) return 1;
+	if (init_x11() != 0) return 1;
+	if (init_egl() != 0) return 2;
+	if (init_gl_resources() != 0) return 3;
 
-	XWindowAttributes  gwa;
-	XGetWindowAttributes ( x_display , win , &gwa );
-
-	bool quit = false;
-	while ( !quit ) {    // the main loop
-
-		while ( XPending ( x_display ) ) {   // check for events from the x-server
-
-			XEvent  xev;
-			XNextEvent( x_display, &xev );
-			if ( xev.type == KeyPress )   quit = true;
-		}
-
-		render(gwa.width, gwa.height);   // now we finally put something on the screen
-		flip();
-	}
+	loop();
 
 	return 0;
 }

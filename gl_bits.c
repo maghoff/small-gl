@@ -1,14 +1,13 @@
 #include <math.h>
 #include <stdbool.h>
 #include <GLES2/gl2.h>
-#include <EGL/egl.h>
 
 #include "vertex_glsl.h"
 #include "fragment_glsl.h"
 
 static GLuint load_shader(const char *shader_source, GLenum type) {
    GLuint  shader = glCreateShader(type);
-   glShaderSource(shader, 1, &shader_source, NULL);
+   glShaderSource(shader, 1, &shader_source, 0);
    glCompileShader(shader);
    return shader;
 }
