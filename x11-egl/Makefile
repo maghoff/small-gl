@@ -9,18 +9,28 @@ LIBS=\
 	-lEGL \
 	-lGLESv2
 
-OPTIMIZATIONS=-Os -flto -s
+OPTIMIZATIONS=\
+	-Os -flto -s \
+	-fno-asynchronous-unwind-tables
 
 DEBUG_FLAGS=-ggdb
 
-RELEASE_CFLAGS=$(LIBS) $(BASIC_FLAGS) $(OPTIMIZATIONS)
-DEBUG_CFLAGS=$(LIBS) $(BASIC_FLAGS) $(DEBUG_FLAGS)
+RELEASE_CFLAGS=$(BASIC_FLAGS) $(OPTIMIZATIONS)
+DEBUG_CFLAGS=$(BASIC_FLAGS) $(DEBUG_FLAGS)
 
-main: $(SRCS) $(HEADERS)
-	gcc -o $@ $(SRCS) $(RELEASE_CFLAGS)
+main: main-prestrip
+	strip \
+		-R .comment \
+		-R '.note*' \
+		-R '.eh*' \
+		-o $@ \
+		$<
+
+main-prestrip: $(SRCS) $(HEADERS)
+	gcc -o $@ $(RELEASE_CFLAGS) $(SRCS) $(LIBS)
 
 main-dbg: $(SRCS) $(HEADERS)
-	gcc -o $@ $(SRCS) $(DEBUG_CFLAGS)
+	gcc -o $@ $(DEBUG_CFLAGS) $(SRCS) $(LIBS)
 
 %_glsl.h: %.glsl
 	xxd -i $< | sed 's/unsigned char/static const char/' > $@
