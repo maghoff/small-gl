@@ -1,3 +1,5 @@
 *_glsl.h
 main
 main-prestrip
+main-bin
+main.xz

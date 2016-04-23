@@ -18,7 +18,15 @@ DEBUG_FLAGS=-ggdb
 RELEASE_CFLAGS=$(BASIC_FLAGS) $(OPTIMIZATIONS)
 DEBUG_CFLAGS=$(BASIC_FLAGS) $(DEBUG_FLAGS)
 
-main: main-prestrip
+main: main.xz
+	echo 'dd bs=1 skip=60<$$0|xz -d>/tmp/C;chmod +x /tmp/C;/tmp/C;exit' > $@
+	cat $< >> $@
+	chmod a+x $@
+
+main.xz: main-bin
+	xz -c9e $< > $@
+
+main-bin: main-prestrip
 	strip \
 		-R .comment \
 		-R '.note*' \
