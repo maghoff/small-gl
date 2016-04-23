@@ -1,7 +1,8 @@
 main: main.c Makefile
 	gcc \
 		-o $@ \
-		$< \
-		-Os -flto -s \
+		-Os -s \
+		-flto \
+		-nostartfiles \
 		-nostdlib \
-		-nostartfiles
+		$<
