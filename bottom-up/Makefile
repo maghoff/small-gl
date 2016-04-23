@@ -1,5 +1,5 @@
 main: main-prestrip
-	strip -R .comment -o $@ $<
+	strip -R .comment -R .note* -o $@ $<
 
 main-prestrip: main.c Makefile
 	gcc \
