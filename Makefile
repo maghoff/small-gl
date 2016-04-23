@@ -10,7 +10,7 @@ main: $(SRCS) vertex_glsl.h fragment_glsl.h
 		-Os -flto -s
 
 %_glsl.h: %.glsl
-	xxd -i $< | sed 's/unsigned char/static const char/' | sed 's/unsigned int.*//' > $@
+	xxd -i $< | sed 's/unsigned char/static const char/' > $@
 
 .PHONY: clean
 clean:
